@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>一键SOS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=Noto+Sans+SC:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div id="app" class="app-container">
+    
+    <!-- 5️⃣ 启动引导页 Onboarding Page -->
+    <div id="page-onboarding" class="page">
+      <div class="carousel">
+        <div class="slide active">
+          <i class="ph ph-shield-check slide-icon text-red"></i>
+          <h2>什么是SOS?</h2>
+          <p>在紧急情况下，一键通知您的紧急联系人并发送实时位置。</p>
+        </div>
+        <div class="slide">
+          <i class="ph ph-hand-pointing slide-icon text-red"></i>
+          <h2>如何使用?</h2>
+          <p>长按首页的红色大按钮 1.5 秒即可触发全方位警报。</p>
+        </div>
+        <div class="slide">
+          <i class="ph ph-lock-key slide-icon text-red"></i>
+          <h2>权限说明</h2>
+          <p>我们需要获取您的定位和短信权限以确保求救信息准确送达。</p>
+          <button id="btn-start" class="btn-primary mt-30">立即开始</button>
+        </div>
+      </div>
+      <div class="carousel-indicators">
+        <span class="dot active"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </div>
+    </div>
+
+    <!-- 1️⃣ 首页 Home Page -->
+    <div id="page-home" class="page active">
+      <header class="top-bar">
+        <div class="logo-area">
+          <div class="logo-icon-bg">
+            <i class="ph ph-shield-check"></i>
+          </div>
+          <div class="logo-text">
+            <h1 data-i18n="appTitle">紧急救援</h1>
+            <span data-i18n="appSubtitle">随时待命</span>
+          </div>
+        </div>
+        <button class="lang-switch" id="btn-lang-switch">
+          <i class="ph ph-globe"></i>
+        </button>
+      </header>
+
+      <main class="main-content">
+        <!-- 默认状态 -->
+        <div id="sos-default-state" class="state-container active">
+          <div class="sos-container">
+            <button id="btn-sos" class="sos-btn">
+              <svg class="progress-ring" width="260" height="260">
+                <circle class="progress-ring__circle" stroke="white" stroke-width="6" fill="transparent" r="127" cx="130" cy="130" stroke-linecap="round"/>
+              </svg>
+              <div class="sos-btn-inner">
+                <i class="ph ph-phone-call"></i>
+                <h2 data-i18n="sosCall">SOS 紧急呼叫</h2>
+                <span data-i18n="sosSub">电话拨号 + 发送位置</span>
+              </div>
+              <div class="glow-effect"></div>
+            </button>
+          </div>
+          
+          <div class="location-card">
+            <div class="icon-wrapper">
+              <i class="ph ph-map-pin"></i>
+            </div>
+            <div class="location-info">
+              <span class="label" data-i18n="currentLoc">当前位置</span>
+              <span class="value" id="loc-text">CURRENT LOCATION</span>
+              <span class="coords">39.9078, 116.3975</span>
+            </div>
+            <div class="status-dot"></div>
+          </div>
+
+          <button class="aed-btn">
+            <i class="ph-fill ph-lightning"></i>
+            <span data-i18n="nearbyAed">附近 AED</span>
+          </button>
+
+          <section class="video-section">
+            <div class="section-title">
+              <i class="ph-fill ph-play-circle" style="color: #ff4757;"></i>
+              <h3 data-i18n="sosVideo">SOS 视频</h3>
+            </div>
+            <div class="video-grid">
+              <div class="video-card">
+                <div class="thumbnail" style="background-image: url('/images/cpr.png')">
+                  <div class="play-btn">
+                    <i class="ph-fill ph-play"></i>
+                  </div>
+                </div>
+                <h4 data-i18n="cpr">心肺复苏</h4>
+              </div>
+              <div class="video-card">
+                <div class="thumbnail" style="background-image: url('/images/aed.png')">
+                  <div class="play-btn">
+                    <i class="ph-fill ph-play"></i>
+                  </div>
+                </div>
+                <h4 data-i18n="aedUsage">AED 使用</h4>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- 触发后状态 (Loading / Cancel) -->
+        <div id="sos-sending-state" class="state-container sending-container">
+          <div class="sending-header">
+            <div class="sending-icon-wrapper">
+              <i class="ph ph-warning-circle"></i>
+            </div>
+            <h2 data-i18n="preparing">准备发送</h2>
+          </div>
+
+          <div class="sending-card">
+            <div class="sending-row">
+              <div class="sending-row-icon">
+                <i class="ph ph-map-pin"></i>
+              </div>
+              <div class="sending-row-info">
+                <span class="sending-label" data-i18n="locationShare">位置共享</span>
+                <span class="sending-value" data-i18n="waitingTrigger">等待触发...</span>
+              </div>
+            </div>
+            
+            <div class="sending-row">
+              <div class="sending-row-icon">
+                <i class="ph ph-users"></i>
+              </div>
+              <div class="sending-row-info">
+                <span class="sending-label" data-i18n="emergencyContact">紧急联系人</span>
+                <span class="sending-value" data-i18n="prepareAlert">准备提醒</span>
+              </div>
+            </div>
+
+            <div class="sending-countdown-header">
+              <span data-i18n="autoSendCountdown">自动发送倒计时</span>
+              <span class="countdown-val text-red"><span id="cancel-countdown">5</span>S</span>
+            </div>
+            <div class="sending-progress-bar">
+              <div class="sending-progress-fill" id="cancel-progress"></div>
+            </div>
+
+            <button id="btn-cancel-sos" class="btn-cancel-dark">
+              <i class="ph ph-x"></i> <span data-i18n="cancelSOS">取消求救</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 实际发送中状态 (Intermediate Sending) -->
+        <div id="sos-actual-sending-state" class="state-container success-container">
+          <div class="sending-header">
+            <div class="sending-icon-wrapper">
+              <i class="ph ph-spinner-gap spinning-icon"></i>
+            </div>
+            <h2 data-i18n="sendingNow">正在发送...</h2>
+          </div>
+
+          <div class="sending-card">
+            <div class="sending-row">
+              <div class="sending-row-icon" style="background-color: #2ed573;">
+                <i class="ph ph-map-pin"></i>
+              </div>
+              <div class="sending-row-info">
+                <span class="sending-label" data-i18n="locationShare3">位置共享</span>
+                <span class="sending-value" data-i18n="locAttached">位置已附加</span>
+              </div>
+            </div>
+            
+            <div class="sending-row">
+              <div class="sending-row-icon">
+                <i class="ph ph-users"></i>
+              </div>
+              <div class="sending-row-info">
+                <span class="sending-label" data-i18n="emergencyContact3">紧急联系人</span>
+                <span class="sending-value" data-i18n="prepareAlert">准备提醒</span>
+              </div>
+            </div>
+
+            <button id="btn-cancel-actual" class="btn-cancel-dark mt-20">
+              <i class="ph ph-x"></i> <span data-i18n="cancelSOS3">取消求救</span>
+            </button>
+          </div>
+
+          <div class="success-actions">
+            <button class="action-btn bg-blue">
+              <i class="ph ph-phone-call"></i> <span data-i18n="callEmergency">拨打 110/119/120</span>
+            </button>
+            <button class="action-btn bg-green">
+              <i class="ph ph-chat-text"></i> <span data-i18n="quickSms">快捷短信</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 成功状态 -->
+        <div id="sos-success-state" class="state-container success-container">
+          <div class="sending-header">
+            <div class="sending-icon-wrapper">
+              <i class="ph ph-check-circle"></i>
+            </div>
+            <h2 data-i18n="rescueOnWay">救援已在路上</h2>
+          </div>
+
+          <div class="sending-card">
+            <div class="sending-row">
+              <div class="sending-row-icon" style="background-color: #2ed573;">
+                <i class="ph ph-map-pin"></i>
+              </div>
+              <div class="sending-row-info">
+                <span class="sending-label" data-i18n="locationShare2">位置共享</span>
+                <span class="sending-value" data-i18n="locAttached">位置已附加</span>
+              </div>
+            </div>
+            
+            <div class="sending-row">
+              <div class="sending-row-icon" style="background-color: #2ed573;">
+                <i class="ph ph-users"></i>
+              </div>
+              <div class="sending-row-info">
+                <span class="sending-label" data-i18n="emergencyContact2">紧急联系人</span>
+                <span class="sending-value" data-i18n="noticeSent">通知已发送</span>
+              </div>
+            </div>
+
+            <button id="btn-reset-sos" class="btn-cancel-dark mt-20">
+              <i class="ph ph-x"></i> <span data-i18n="cancelSOS2">取消求救</span>
+            </button>
+          </div>
+
+          <div class="success-actions">
+            <button class="action-btn bg-blue">
+              <i class="ph ph-phone-call"></i> <span data-i18n="callEmergency">拨打 110/119/120</span>
+            </button>
+            <button class="action-btn bg-green">
+              <i class="ph ph-chat-text"></i> <span data-i18n="quickSms">快捷短信</span>
+            </button>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- 2️⃣ 紧急联系人管理页 Contacts Page -->
+    <div id="page-contacts" class="page">
+      <header class="page-header split">
+        <h2>紧急联系人</h2>
+        <button class="btn-icon" id="btn-add-contact"><i class="ph ph-plus"></i></button>
+      </header>
+      <main class="page-content scrollable">
+        <div class="contact-list" id="contact-list">
+          <!-- Contact Items -->
+        </div>
+      </main>
+    </div>
+
+    <!-- 4️⃣ 求救记录页 History Page -->
+    <div id="page-history" class="page">
+      <header class="page-header">
+        <h2>求救记录</h2>
+      </header>
+      <main class="page-content scrollable">
+        <div class="history-list" id="history-list">
+          <!-- History Items -->
+        </div>
+      </main>
+    </div>
+
+    <!-- 3️⃣ 求救设置页 Settings Page -->
+    <div id="page-settings" class="page">
+      <header class="page-header">
+        <h2>设置</h2>
+      </header>
+      <main class="page-content scrollable">
+        <div class="settings-group">
+          <h3>自动化设置</h3>
+          <div class="setting-item">
+            <span>自动发送短信</span>
+            <label class="toggle-switch"><input type="checkbox" checked><span class="slider"></span></label>
+          </div>
+          <div class="setting-item">
+            <span>自动拨打电话</span>
+            <label class="toggle-switch"><input type="checkbox" checked><span class="slider"></span></label>
+          </div>
+          <div class="setting-item">
+            <span>上传实时位置</span>
+            <label class="toggle-switch"><input type="checkbox" checked><span class="slider"></span></label>
+          </div>
+          <div class="setting-item">
+            <span>循环发送 (每30秒)</span>
+            <label class="toggle-switch"><input type="checkbox"><span class="slider"></span></label>
+          </div>
+        </div>
+
+        <div class="settings-group mt-30">
+          <h3>危险等级</h3>
+          <div class="radio-group">
+            <label class="radio-item">
+              <input type="radio" name="risk-level" value="low">
+              <div class="radio-content">
+                <h4>低风险</h4>
+                <p>仅通知联系人</p>
+              </div>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="risk-level" value="medium" checked>
+              <div class="radio-content">
+                <h4>中风险</h4>
+                <p>通知联系人并发送定位</p>
+              </div>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="risk-level" value="high">
+              <div class="radio-content">
+                <h4>高风险</h4>
+                <p>通知、电话、高频定位</p>
+              </div>
+            </label>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Shared Bottom Nav -->
+    <nav class="bottom-nav" id="bottom-nav">
+      <a href="#home" class="nav-item active" data-target="page-home">
+        <i class="ph ph-shield-warning"></i>
+        <span data-i18n="navHome">求救</span>
+      </a>
+      <a href="#contacts" class="nav-item" data-target="page-contacts">
+        <i class="ph ph-users"></i>
+        <span data-i18n="navContacts">联系人</span>
+      </a>
+      <a href="#history" class="nav-item" data-target="page-history">
+        <i class="ph ph-clock-counter-clockwise"></i>
+        <span data-i18n="navHistory">记录</span>
+      </a>
+      <a href="#settings" class="nav-item" data-target="page-settings">
+        <i class="ph ph-gear"></i>
+        <span data-i18n="navSettings">设置</span>
+      </a>
+    </nav>
+  </div>
+  <script type="module" src="/main.js"></script>
+</body>
+</html>
