@@ -331,6 +331,114 @@
       </main>
     </div>
 
+    <!-- 6️⃣ AED 地图页 AED Map Page -->
+    <div id="page-aed" class="page aed-page">
+      <header class="aed-header">
+        <button class="aed-back-btn" id="btn-aed-back">
+          <i class="ph ph-caret-left"></i>
+        </button>
+        <div class="aed-header-text">
+          <h2>AED 地图</h2>
+          <span data-i18n="aedMapSub">附近 AED</span>
+        </div>
+        <div style="width:40px"></div>
+      </header>
+
+      <!-- Simulated Map Area -->
+      <div class="aed-map-area" id="aed-map-area">
+        <div class="aed-map-bg">
+          <!-- Grid lines for map effect -->
+          <div class="map-grid"></div>
+          <!-- Radial range rings -->
+          <div class="map-range-ring ring-1"></div>
+          <div class="map-range-ring ring-2"></div>
+          <div class="map-range-ring ring-3"></div>
+        </div>
+        <!-- User location dot -->
+        <div class="user-loc-dot">
+          <div class="user-loc-pulse"></div>
+          <div class="user-loc-center"></div>
+        </div>
+        <!-- AED Markers (positioned dynamically via JS) -->
+        <div class="aed-marker" data-aed-id="0" style="top:22%;left:68%">
+          <div class="aed-marker-icon"><i class="ph-fill ph-lightning"></i></div>
+        </div>
+        <div class="aed-marker" data-aed-id="1" style="top:32%;left:38%">
+          <div class="aed-marker-icon"><i class="ph-fill ph-lightning"></i></div>
+        </div>
+        <div class="aed-marker" data-aed-id="2" style="top:50%;left:62%">
+          <div class="aed-marker-icon"><i class="ph-fill ph-lightning"></i></div>
+        </div>
+        <div class="aed-marker" data-aed-id="3" style="top:70%;left:20%">
+          <div class="aed-marker-icon"><i class="ph-fill ph-lightning"></i></div>
+        </div>
+      </div>
+
+      <!-- AED Device List Panel -->
+      <div class="aed-panel" id="aed-panel">
+        <div class="aed-panel-header">
+          <h3 data-i18n="discoverAed">发现附近 AED</h3>
+          <span class="aed-device-count" id="aed-device-count">4 DEVICES</span>
+        </div>
+        <div class="aed-device-list" id="aed-device-list">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+
+      <!-- AED Info Popup Modal -->
+      <div class="aed-info-overlay" id="aed-info-overlay">
+        <div class="aed-info-modal" id="aed-info-modal">
+          <div class="aed-info-close" id="aed-info-close">
+            <i class="ph ph-x"></i>
+          </div>
+          <div class="aed-info-header">
+            <div class="aed-info-icon-wrapper">
+              <i class="ph-fill ph-lightning"></i>
+            </div>
+            <div class="aed-info-status" id="aed-info-status">可用</div>
+          </div>
+          <h3 class="aed-info-name" id="aed-info-name">--</h3>
+          <p class="aed-info-address" id="aed-info-address">--</p>
+
+          <div class="aed-info-details">
+            <div class="aed-info-detail-row">
+              <div class="aed-info-detail-icon"><i class="ph ph-map-pin"></i></div>
+              <div class="aed-info-detail-text">
+                <span class="aed-detail-label" data-i18n="distance">距离</span>
+                <span class="aed-detail-value" id="aed-info-distance">--</span>
+              </div>
+            </div>
+            <div class="aed-info-detail-row">
+              <div class="aed-info-detail-icon"><i class="ph ph-clock"></i></div>
+              <div class="aed-info-detail-text">
+                <span class="aed-detail-label" data-i18n="walkTime">步行时间</span>
+                <span class="aed-detail-value" id="aed-info-time">--</span>
+              </div>
+            </div>
+            <div class="aed-info-detail-row">
+              <div class="aed-info-detail-icon"><i class="ph ph-buildings"></i></div>
+              <div class="aed-info-detail-text">
+                <span class="aed-detail-label" data-i18n="floor">楼层</span>
+                <span class="aed-detail-value" id="aed-info-floor">--</span>
+              </div>
+            </div>
+            <div class="aed-info-detail-row">
+              <div class="aed-info-detail-icon"><i class="ph ph-calendar-check"></i></div>
+              <div class="aed-info-detail-text">
+                <span class="aed-detail-label" data-i18n="lastCheck">上次检查</span>
+                <span class="aed-detail-value" id="aed-info-check">--</span>
+              </div>
+            </div>
+          </div>
+
+          <button class="aed-navigate-btn" id="aed-navigate-btn">
+            <i class="ph ph-navigation-arrow"></i>
+            <span data-i18n="navigateTo">导航前往</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Shared Bottom Nav -->
     <nav class="bottom-nav" id="bottom-nav">
       <a href="#home" class="nav-item active" data-target="page-home">

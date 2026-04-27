@@ -352,6 +352,214 @@ document.addEventListener('DOMContentLoaded', () => {
     list.insertAdjacentHTML('afterbegin', newRecord);
   }
 
+
+  // === AED Map Page Logic ===
+  const aedData = [
+    {
+      id: 0,
+      name: '地铁站 E 出口',
+      nameEn: 'SUBWAY STATION EXIT E',
+      address: '北京市朝阳区建国路88号 地铁站E出口旁',
+      addressEn: '88 Jianguo Rd, Chaoyang, Exit E',
+      distance: '120m',
+      walkTime: '约 2 分钟',
+      walkTimeEn: '~2 min',
+      floor: 'B1 层',
+      floorEn: 'B1',
+      lastCheck: '2026-04-25',
+      status: '可用',
+      statusEn: 'Available'
+    },
+    {
+      id: 1,
+      name: '社区卫生服务中心',
+      nameEn: 'COMMUNITY HEALTH CENTER',
+      address: '北京市朝阳区光华路12号 一楼大厅',
+      addressEn: '12 Guanghua Rd, Chaoyang, 1F Lobby',
+      distance: '350m',
+      walkTime: '约 5 分钟',
+      walkTimeEn: '~5 min',
+      floor: '1 层',
+      floorEn: '1F',
+      lastCheck: '2026-04-20',
+      status: '可用',
+      statusEn: 'Available'
+    },
+    {
+      id: 2,
+      name: '健身中心前台',
+      nameEn: 'FITNESS CENTER FRONT DESK',
+      address: '北京市朝阳区建外SOHO东区3号楼 健身中心',
+      addressEn: '3 Jianwai SOHO East, Chaoyang',
+      distance: '500m',
+      walkTime: '约 7 分钟',
+      walkTimeEn: '~7 min',
+      floor: '2 层',
+      floorEn: '2F',
+      lastCheck: '2026-04-18',
+      status: '可用',
+      statusEn: 'Available'
+    },
+    {
+      id: 3,
+      name: '购物中心服务台',
+      nameEn: 'SHOPPING MALL SERVICE DESK',
+      address: '北京市朝阳区朝阳大悦城 1层服务台',
+      addressEn: 'Chaoyang Joy City, 1F Service Desk',
+      distance: '800m',
+      walkTime: '约 11 分钟',
+      walkTimeEn: '~11 min',
+      floor: '1 层',
+      floorEn: '1F',
+      lastCheck: '2026-04-15',
+      status: '维护中',
+      statusEn: 'Maintenance'
+    }
+  ];
+
+  // Render AED device cards
+  const renderAedDevices = () => {
+    const listEl = document.getElementById('aed-device-list');
+    if (!listEl) return;
+    listEl.innerHTML = aedData.map((d, i) => `
+      <div class="aed-device-card" data-aed-id="${d.id}">
+        <div class="aed-device-card-icon">
+          <i class="ph-fill ph-lightning"></i>
+        </div>
+        <div class="aed-device-card-name">${currentLang === 'zh' ? d.name : d.nameEn}</div>
+        <div class="aed-device-card-dist">${d.distance}</div>
+      </div>
+    `).join('');
+  };
+
+  // Open AED page
+  const aedBtn = document.querySelector('.aed-btn');
+  if (aedBtn) {
+    aedBtn.addEventListener('click', () => {
+      // Hide bottom nav, show AED page
+      bottomNav.classList.add('hidden');
+      pages.forEach(p => p.classList.remove('active'));
+      const aedPage = document.getElementById('page-aed');
+      if (aedPage) aedPage.classList.add('active');
+      renderAedDevices();
+    });
+  }
+
+  // Back button
+  const btnAedBack = document.getElementById('btn-aed-back');
+  if (btnAedBack) {
+    btnAedBack.addEventListener('click', () => {
+      const aedPage = document.getElementById('page-aed');
+      if (aedPage) aedPage.classList.remove('active');
+      // Close info overlay if open
+      const overlay = document.getElementById('aed-info-overlay');
+      if (overlay) overlay.classList.remove('active');
+      // Clear selections
+      document.querySelectorAll('.aed-marker.selected').forEach(m => m.classList.remove('selected'));
+      document.querySelectorAll('.aed-device-card.selected').forEach(c => c.classList.remove('selected'));
+      navigateTo('page-home');
+    });
+  }
+
+  // Show AED info popup
+  function showAedInfo(id) {
+    const d = aedData.find(a => a.id === id);
+    if (!d) return;
+
+    document.getElementById('aed-info-name').textContent = currentLang === 'zh' ? d.name : d.nameEn;
+    document.getElementById('aed-info-address').textContent = currentLang === 'zh' ? d.address : d.addressEn;
+    document.getElementById('aed-info-distance').textContent = d.distance;
+    document.getElementById('aed-info-time').textContent = currentLang === 'zh' ? d.walkTime : d.walkTimeEn;
+    document.getElementById('aed-info-floor').textContent = currentLang === 'zh' ? d.floor : d.floorEn;
+    document.getElementById('aed-info-check').textContent = d.lastCheck;
+    
+    const statusEl = document.getElementById('aed-info-status');
+    statusEl.textContent = currentLang === 'zh' ? d.status : d.statusEn;
+    if (d.status === '维护中') {
+      statusEl.style.color = '#ff9f43';
+      statusEl.style.borderColor = 'rgba(255,159,67,0.2)';
+      statusEl.style.background = 'rgba(255,159,67,0.12)';
+    } else {
+      statusEl.style.color = '#2ed573';
+      statusEl.style.borderColor = 'rgba(46,213,115,0.2)';
+      statusEl.style.background = 'rgba(46,213,115,0.12)';
+    }
+
+    // Highlight marker and card
+    document.querySelectorAll('.aed-marker').forEach(m => {
+      m.classList.toggle('selected', parseInt(m.dataset.aedId) === id);
+    });
+    document.querySelectorAll('.aed-device-card').forEach(c => {
+      c.classList.toggle('selected', parseInt(c.dataset.aedId) === id);
+    });
+
+    // Show overlay with animation
+    const overlay = document.getElementById('aed-info-overlay');
+    overlay.style.display = 'flex';
+    // Trigger reflow for animation
+    overlay.offsetHeight;
+    overlay.classList.add('active');
+  }
+
+  function closeAedInfo() {
+    const overlay = document.getElementById('aed-info-overlay');
+    if (!overlay) return;
+    overlay.classList.remove('active');
+    setTimeout(() => {
+      overlay.style.display = 'none';
+    }, 400);
+    // Clear marker/card selections
+    document.querySelectorAll('.aed-marker.selected').forEach(m => m.classList.remove('selected'));
+    document.querySelectorAll('.aed-device-card.selected').forEach(c => c.classList.remove('selected'));
+  }
+
+  // Marker click
+  document.querySelectorAll('.aed-marker').forEach(marker => {
+    marker.addEventListener('click', () => {
+      const id = parseInt(marker.dataset.aedId);
+      showAedInfo(id);
+    });
+  });
+
+  // Device card click (delegated)
+  const deviceList = document.getElementById('aed-device-list');
+  if (deviceList) {
+    deviceList.addEventListener('click', (e) => {
+      const card = e.target.closest('.aed-device-card');
+      if (!card) return;
+      const id = parseInt(card.dataset.aedId);
+      showAedInfo(id);
+    });
+  }
+
+  // Close info popup
+  const closeBtn = document.getElementById('aed-info-close');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', closeAedInfo);
+  }
+  const overlay = document.getElementById('aed-info-overlay');
+  if (overlay) {
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) closeAedInfo();
+    });
+  }
+
+  // Add AED i18n keys
+  translations.zh.aedMapSub = '附近 AED';
+  translations.zh.discoverAed = '发现附近 AED';
+  translations.zh.distance = '距离';
+  translations.zh.walkTime = '步行时间';
+  translations.zh.floor = '楼层';
+  translations.zh.lastCheck = '上次检查';
+  translations.zh.navigateTo = '导航前往';
+  translations.en.aedMapSub = 'Nearby AED';
+  translations.en.discoverAed = 'Discover Nearby AED';
+  translations.en.distance = 'Distance';
+  translations.en.walkTime = 'Walk Time';
+  translations.en.floor = 'Floor';
+  translations.en.lastCheck = 'Last Checked';
+  translations.en.navigateTo = 'Navigate';
+
   renderContacts();
   renderHistory();
 });
